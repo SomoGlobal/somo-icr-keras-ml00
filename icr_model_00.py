@@ -21,6 +21,9 @@ def generate_model(imagecount, iX, iY, m, strides_per_frame, kernels, attentiona
         strides_per_frame (int): the number of strides that would cover an entire output patch (for the transitional layer)
         kernels: an array of kernel sizes for the feature layers. Kernels are square.
         attentional_depth: how many of the last kind of layer to have
+
+    Returns:
+        a Keras model as described above (compiled but not trained)
         """
 
     t_stride = m / strides_per_frame;
