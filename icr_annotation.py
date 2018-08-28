@@ -33,7 +33,7 @@ class Annotation:
         self.image = image
         self.size = [self.image.width, self.image.height]
         self.boundingbox = boundingbox
-        self.pixels =
+        self.pixels = numpy.zeros(self.image.width, self.image.height)
 
 #   so the aim here is to pull all the patches from an annotation image
 #   we assume each source annotation is all contiguous patches and each patch is one cell
