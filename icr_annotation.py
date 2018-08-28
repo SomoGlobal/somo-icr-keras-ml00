@@ -34,6 +34,7 @@ class Annotation:
         self.size = [self.image.width, self.image.height]
         self.boundingbox = boundingbox
         self.pixels = numpy.zeros(self.image.width, self.image.height)
+        self.flags = numpy.zeros(self.image.width, self.image.height)
 
 #   so the aim here is to pull all the patches from an annotation image
 #   we assume each source annotation is all contiguous patches and each patch is one cell
@@ -54,17 +55,17 @@ class Annotation:
     # Otherwise we just scan.
 
     def visit(self, x, y):
-        if self.pixels[x, y].marked:
+        if self.flags[x, y] > 0:
             return
-        self.pixels[x, y].marked = True
-        if self.pixels[x,y].value == True:
-            self.maybevisit(x-1, y, self.pixels[x, y].value)
-            self.maybevisit(x, y-1, self.pixels[x, y].value)
-            self.maybevisit(x+1, y, self.pixels[x, y].value)
-            self.maybevisit(x, y+1, self.pixels[x, y].value)
+        self.pixels[x, y] = 1
+        if self.pixels[x,y] == 1:
+            self.maybevisit(x-1, y, self.pixels[x, y])
+            self.maybevisit(x, y-1, self.pixels[x, y])
+            self.maybevisit(x+1, y, self.pixels[x, y])
+            self.maybevisit(x, y+1, self.pixels[x, y])
 
     def maybevisit(self, x, y, value):
-        values_equal = self.pixels[x, y].value == value
+        values_equal = self.pixels[x, y] == value
         if values_equal:
             self.visit(x, y)
         return values_equal
