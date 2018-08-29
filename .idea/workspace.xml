@@ -55,24 +55,24 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="py" value="5" />
+          <entry key="py" value="6" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="Python" value="5" />
+          <entry key="Python" value="6" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="dummy" value="7" />
-          <entry key="py" value="4235" />
+          <entry key="py" value="5860" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="PLAIN_TEXT" value="7" />
-          <entry key="Python" value="4235" />
+          <entry key="Python" value="5860" />
         </counts>
       </usages-collector>
     </session>
@@ -103,13 +103,22 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/icr_annotation.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="490">
-              <caret line="62" selection-start-line="62" selection-end-line="62" />
+            <state relative-caret-position="567">
+              <caret line="64" lean-forward="true" selection-start-line="64" selection-end-line="64" />
               <folding>
                 <element signature="e#0#21#0" expanded="true" />
-                <marker date="1535473454659" expanded="true" signature="752:753" ph="..." />
-                <marker date="1535473454659" expanded="true" signature="924:933" ph="..." />
+                <marker date="1535561284260" expanded="true" signature="709:710" ph="..." />
+                <marker date="1535561284260" expanded="true" signature="2136:2138" ph="..." />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file:///Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/PIL/Image.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="7875">
+              <caret line="530" column="23" selection-start-line="530" selection-start-column="23" selection-end-line="530" selection-end-column="23" />
             </state>
           </provider>
         </entry>
@@ -144,9 +153,9 @@
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="-335" />
-    <option name="y" value="-1177" />
-    <option name="width" value="1920" />
-    <option name="height" value="1177" />
+    <option name="y" value="-1152" />
+    <option name="width" value="1771" />
+    <option name="height" value="1085" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
@@ -284,19 +293,19 @@
     </entry>
     <entry file="file:///Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/PIL/Image.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="647">
+        <state relative-caret-position="7875">
           <caret line="530" column="23" selection-start-line="530" selection-start-column="23" selection-end-line="530" selection-end-column="23" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/icr_annotation.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="490">
-          <caret line="62" selection-start-line="62" selection-end-line="62" />
+        <state relative-caret-position="567">
+          <caret line="64" lean-forward="true" selection-start-line="64" selection-end-line="64" />
           <folding>
             <element signature="e#0#21#0" expanded="true" />
-            <marker date="1535473454659" expanded="true" signature="752:753" ph="..." />
-            <marker date="1535473454659" expanded="true" signature="924:933" ph="..." />
+            <marker date="1535561284260" expanded="true" signature="709:710" ph="..." />
+            <marker date="1535561284260" expanded="true" signature="2136:2138" ph="..." />
           </folding>
         </state>
       </provider>
