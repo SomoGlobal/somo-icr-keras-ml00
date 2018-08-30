@@ -28,13 +28,48 @@ class Annotation:
         self.size = size
         self.pixels = numpy.zeros(self.size[0], self.size[1])
         self.com = []
+        self.xmin = None
+        self.xmax = None
+        self.ymin = None
+        self.ymax = None
+        self.__bboxinvalidated = False
+
+    # difficult to find methods
+
+    def __maybeexpandboundingbox(self, x, y):
+        if self.xmin == None or x < self.xmin: self.xmin = x
+        if self.xmax == None or x > self.xmax: self.xmax = x
+        if self.ymin == None or y < self.ymin: self.ymin = y
+        if self.ymax == None or y > self.ymax: self.ymax = y
+
+    def __measureboundingbox(self):
+        self.xmin = None
+        self.xmax = None
+        self.ymin = None
+        self.ymax = None
+        for x in range(0, self.size[0]):
+            for y in range(0, self.size[1]):
+                if self.pixels[x, y] > 0:
+                    self.__maybeexpandboundingbox(x, y)
+        self.__bboxinvalidated = False
+
+    # easy to find methods
 
     def setPixel(self, x, y, value):
         self.pixels[x][y] = value
+        if value == 0:
+            self.__bboxinvalidated = True
+        else:
+            self.__maybeexpandboundingbox(x, y)
 
     def centre_of_mass(self):
         self.com = _centre_of_mass(self.pixels)
         return self.com
+
+    def boundingbox(self):
+        if self.__bboxinvalidated:
+            self.__measureboundingbox()
+        return [self.xmin, self.ymin, self.xmax, self.ymax]
 
 
 class AnnotationFactory:
