@@ -86,11 +86,20 @@ class AnnotationFactory:
         self.image = image
         self.size = [self.image.width, self.image.height]
         self.pixels = numpy.zeros(self.image.width, self.image.height)
+        self.__initializepixels()
         self.flags = numpy.zeros(self.image.width, self.image.height)
         self.annotations = []
         self.patchwidth = None
         self.patchheight = None
 
+    def __initializepixels(self):
+        for x in range(0, self.image.width - 1):
+            for y in range(0, self.image.height - 1):
+                r, g, b = self.image.getpixel((x, y))
+                if r > 127 or g > 127 or b > 127:
+                    self.pixels[x, y] = 1
+                else:
+                    self.pixels[x, y] = 0
 
     def __collectionpatchsize(self, box):
         patchwidth = numpy.abs(box[2] - box[0])
@@ -156,3 +165,5 @@ class AnnotationFactory:
         if values_equal:
             self.visit(x, y, annotation)
         return values_equal
+
+
