@@ -72,6 +72,8 @@ class Annotation:
         return [self.xmin, self.ymin, self.xmax, self.ymax]
 
 
+
+
 class AnnotationFactory:
 #   so the aim here is to pull all the patches from an annotation image
 #   we assume each source annotation is all contiguous patches and each patch is one cell
@@ -86,6 +88,16 @@ class AnnotationFactory:
         self.pixels = numpy.zeros(self.image.width, self.image.height)
         self.flags = numpy.zeros(self.image.width, self.image.height)
         self.annotations = []
+        self.patchwidth = None
+        self.patchheight = None
+
+
+    def __collectionpatchsize(self, box):
+        patchwidth = numpy.abs(box[2] - box[0])
+        patchheight = numpy.abs(box[3] - box[1])
+        if self.patchwidth == None or patchwidth > self.patchwidth: self.patchwidth = patchwidth
+        if self.patchheight == None or patchheight > self.patchheight: self.patchheight = patchheight
+
 
     def collectionFrom(self):
         for x in range(0, self.image.width - 1):
@@ -93,6 +105,7 @@ class AnnotationFactory:
                 annotation = self.visit(x, y, None)
                 if annotation is not None:
                     annotation.centre_of_mass()
+                    self.__collectionpatchsize(annotation.boundingbox())
                     self.annotations.append(annotation)
 
         return self.annotations
