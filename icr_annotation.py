@@ -1,6 +1,7 @@
 from PIL import Image
 import numpy
 
+
 def _centre_of_mass(one_hot_array):
     """Returns the centre of mass for an image, determined as the average of moments in X and Y directions."""
     oha = numpy.asarray(one_hot_array)
@@ -22,6 +23,20 @@ def _centre_of_mass(one_hot_array):
 
     mass = X * Y
     return [momentX / mass, momentY / mass]
+
+
+class AnnotationPatchFactory:
+    def __init__(self, annotations, gridsize, imagesize):
+        """takes a list of annotations"""
+        self.annotations = annotations
+        self.gridsize = gridsize
+        self.imagesize = imagesize
+        self.grid = [[[] for j in range(gridsize)] for i in range(gridsize)]
+        self.size = self.annotations[0].size
+
+        for annotation in self.annotations:
+            pass
+
 
 class Annotation:
     def __init__(self, size):
@@ -78,14 +93,12 @@ class Annotation:
         return [self.xmin, self.ymin, self.xmax, self.ymax]
 
 
-
-
 class AnnotationFactory:
-#   so the aim here is to pull all the patches from an annotation image
-#   we assume each source annotation is all contiguous patches and each patch is one cell
-#   this function just splits them
-#   first another function gets a patch
-#   then the centre of mass is got and added to a collection
+    # so the aim here is to pull all the patches from an annotation image
+    # we assume each source annotation is all contiguous patches and each patch is one cell
+    # this function just splits them
+    # first another function gets a patch
+    # then the centre of mass is got and added to a collection
     def __init__(self, image):
         if not isinstance(image, Image.Image):
             raise ValueError("This constructor takes a PIL Image object. Jah Wobble!")
@@ -151,7 +164,6 @@ class AnnotationFactory:
         # otherwise we should return a contiguous region of hot pixels.
         return annotation
 
-
     def __maybevisit(self, x, y, value, annotation):
         """visits a pixel if the pixel's value is the same as the value passed in"""
         values_equal = self.pixels[x, y] == value
@@ -170,9 +182,4 @@ class AnnotationFactory:
                     self.annotations.append(annotation)
 
         return self.annotations
-
-
-#    def getContiguousPatch(self, image, ):
-
-
 
