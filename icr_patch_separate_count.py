@@ -25,7 +25,7 @@ def _centre_of_mass(one_hot_array):
     return [moment_x / mass, moment_y / mass]
 
 
-class Annotation:
+class Patch:
     def __init__(self, size):
         self.size = size
         self.pixels = numpy.zeros(self.size[0], self.size[1])
@@ -74,7 +74,7 @@ class Annotation:
         return [self.xmin, self.ymin, self.xmax, self.ymax]
 
 
-class AnnotationFactory:
+class PatchFactory:
     # so the aim here is to pull all the patches from an annotation image
     # we assume each source annotation is all contiguous patches and each patch is one cell
     # this function just splits them
@@ -85,11 +85,52 @@ class AnnotationFactory:
             raise ValueError("This constructor takes a PIL Image object. Jah Wobble!")
         self.image = image
         self.size = [self.image.width, self.image.height]
-        self.pixels = numpy.zeros(self.image.width, self.image.height)
-        self.flags = numpy.zeros(self.image.width, self.image.height)
+        self.px = self.image.load()
+        self.pixels = numpy.zeros((self.image.width, self.image.height))
+        self.flags = numpy.zeros((self.image.width, self.image.height))
         self.annotations = []
         self.patchwidth = None
         self.patchheight = None
+        self.threshold = self.otsu()
+        print("otsu " + str(self.threshold))
+
+    def otsu(self):
+        histogram = self.image.histogram()
+        pxtotal = self.size[0] * self.size[1]
+
+        sum0 = 0
+        sqr0 = 0
+        sum1 = pxtotal
+        sqr1 = self.sqr1_256(histogram)
+        min = -1
+
+        for threshold in range(256):
+            print("sum0^2 " + str(sum0 * sum0) + " sqr0 " + str(sqr0))
+
+            sum0 += histogram[threshold]
+            sum1 -= histogram[threshold]
+            sqr = histogram[threshold] * histogram[threshold]
+            sqr0 += sqr
+            sqr1 -= sqr
+            vars = sum0 * (sqr0 - (sum0 * sum0)) + sum1 * (sqr1 - (sum1 * sum1))
+
+            print("sum0^2 " + str(sum0 * sum0) + " sqr0 " + str(sqr0))
+            print("sum1^2 " + str(sum1 * sum1) + " sqr1 " + str(sqr1))
+            print("vars " + str(vars) + " min " + str(min))
+
+            if vars < min or min == -1:
+                min = vars
+                minthreshold = threshold
+
+        return minthreshold
+
+    def sqr1_256(self, histogram):
+        sqr1 = 0
+        for i in range(256):
+            sqr1 += histogram[i] * histogram[i]
+
+        return sqr1
+
 
     def __collectionpatchsize(self, box):
         patchwidth = numpy.abs(box[2] - box[0])
@@ -118,7 +159,7 @@ class AnnotationFactory:
     # connected pixel in a True region, so we can regard the root return of any visit as an entire patch.
     # Otherwise we just scan.
 
-    def visit(self, x, y, annotation):
+    def visit(self, x, y, patch):
 
         # check for a flag
         if self.flags[x, y] > 0:
@@ -129,27 +170,32 @@ class AnnotationFactory:
         self.flags[x, y] = 1
 
         # is this a hot pixel?
-        if self.pixels[x,y] == 1:
+        if self.px[x, y][0] > self.threshold:
 
             # if this is the top of the recursion, make an Annotation to hold the hot pixels
-            if annotation is None:
-                annotation = Annotation(self.size)
+            if patch is None:
+                patch = Patch(self.size)
 
             # mark this hot pixel in the current annotation
-            annotation.set_pixel(x, y, 1)
+            patch.set_pixel(x, y, 1)
 
             # try all the neighbours (recursive, uses the annotation we either received or made)
-            self.maybevisit(x-1, y, self.pixels[x, y], annotation)
-            self.maybevisit(x, y-1, self.pixels[x, y], annotation)
-            self.maybevisit(x+1, y, self.pixels[x, y], annotation)
-            self.maybevisit(x, y+1, self.pixels[x, y], annotation)
+            self.maybevisit(x-1, y, self.pixels[x, y], patch)
+            self.maybevisit(x, y-1, self.pixels[x, y], patch)
+            self.maybevisit(x+1, y, self.pixels[x, y], patch)
+            self.maybevisit(x, y+1, self.pixels[x, y], patch)
 
         # if this wasn't a hot pixel, we return nothing.
         # otherwise we should return a contiguous region of hot pixels.
-        return annotation
+        return patch
 
     def maybevisit(self, x, y, value, annotation):
         values_equal = self.pixels[x, y] == value
         if values_equal:
             self.visit(x, y, annotation)
         return values_equal
+
+
+im = Image.open("./data/feets.tif")
+patches = PatchFactory(im).collectionFrom()
+
