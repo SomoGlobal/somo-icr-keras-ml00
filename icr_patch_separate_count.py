@@ -28,7 +28,7 @@ def _centre_of_mass(one_hot_array):
 class Patch:
     def __init__(self, size):
         self.size = size
-        self.pixels = numpy.zeros(self.size[0], self.size[1])
+        self.pixels = numpy.zeros((self.size[0], self.size[1]))
         self.com = []
         self.xmin = None
         self.xmax = None
@@ -91,8 +91,9 @@ class PatchFactory:
         self.annotations = []
         self.patchwidth = None
         self.patchheight = None
-        self.threshold = self.otsu()
-        print("otsu " + str(self.threshold))
+        self.threshold = 150 #self.otsu()
+        self.__exactequality = False
+        print("threshold " + str(self.threshold))
 
     def otsu(self):
         histogram = self.image.histogram()
@@ -103,6 +104,7 @@ class PatchFactory:
         sum1 = pxtotal
         sqr1 = self.sqr1_256(histogram)
         min = -1
+        minthreshold = -99
 
         for threshold in range(256):
             print("sum0^2 " + str(sum0 * sum0) + " sqr0 " + str(sqr0))
@@ -117,6 +119,7 @@ class PatchFactory:
             print("sum0^2 " + str(sum0 * sum0) + " sqr0 " + str(sqr0))
             print("sum1^2 " + str(sum1 * sum1) + " sqr1 " + str(sqr1))
             print("vars " + str(vars) + " min " + str(min))
+            print("minthreshold " + str(minthreshold))
 
             if vars < min or min == -1:
                 min = vars
@@ -143,6 +146,7 @@ class PatchFactory:
             for y in range(0, self.image.height - 1):
                 annotation = self.visit(x, y, None)
                 if annotation is not None:
+                    print("annotation added")
                     annotation.centre_of_mass()
                     self.__collectionpatchsize(annotation.boundingbox())
                     self.annotations.append(annotation)
@@ -179,23 +183,33 @@ class PatchFactory:
             # mark this hot pixel in the current annotation
             patch.set_pixel(x, y, 1)
 
-            # try all the neighbours (recursive, uses the annotation we either received or made)
-            self.maybevisit(x-1, y, self.pixels[x, y], patch)
-            self.maybevisit(x, y-1, self.pixels[x, y], patch)
-            self.maybevisit(x+1, y, self.pixels[x, y], patch)
-            self.maybevisit(x, y+1, self.pixels[x, y], patch)
+            # try all the neighbours in bounds (recursive, uses the annotation we either received or made)
+            if x >= 1:
+                self.maybevisit(x-1, y, self.pixels[x, y], patch)
+            if y >= 1:
+                self.maybevisit(x, y-1, self.pixels[x, y], patch)
+            if x < self.size[0]:
+                self.maybevisit(x+1, y, self.pixels[x, y], patch)
+            if y < self.size[1]:
+                self.maybevisit(x, y+1, self.pixels[x, y], patch)
 
         # if this wasn't a hot pixel, we return nothing.
         # otherwise we should return a contiguous region of hot pixels.
         return patch
 
     def maybevisit(self, x, y, value, annotation):
-        values_equal = self.pixels[x, y] == value
-        if values_equal:
+        values_match = self.__match(self.pixels[x, y], value)
+        if values_match:
             self.visit(x, y, annotation)
-        return values_equal
+        return values_match
+
+    def __match(self, a, b):
+        if self.__exactequality:
+            return a == b
+        else:
+            return not (a > self.threshold) ^ (b > self.threshold)
 
 
 im = Image.open("./data/feets.tif")
 patches = PatchFactory(im).collectionFrom()
-
+print("number of patches " + str(patches.__len__()))
