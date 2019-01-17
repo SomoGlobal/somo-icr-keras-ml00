@@ -209,7 +209,20 @@ class PatchFactory:
         else:
             return not (a > self.threshold) ^ (b > self.threshold)
 
+    def write(self, path, format):
+        output = Image.new("1", self.size, 0)
+        pixels = output.load()
+        for annotation in self.annotations:
+            for x in range(self.size[0]):
+                for y in range(self.size[1]):
+                    if annotation.pixels[x, y] > 0:
+                        pixels[(x, y)] = 1
+
+        output.save(path, format)
+
 
 im = Image.open("./data/feets.tif")
-patches = PatchFactory(im).collectionFrom()
+pf = PatchFactory(im)
+patches = pf.collectionFrom()
 print("number of patches " + str(patches.__len__()))
+pf.write("./data/farts.png", "PNG")
