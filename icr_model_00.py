@@ -1,6 +1,8 @@
 from keras.models import Sequential
 from keras.layers import Conv2D
 
+ACTIVATION = "relu"
+
 
 def generate_model(imagecount, iX, iY, m, strides_per_frame, kernelfilters, attentional_depth):
     """This function creates a model that, *I hope*, takes as input an image of cancer cells
@@ -32,14 +34,14 @@ def generate_model(imagecount, iX, iY, m, strides_per_frame, kernelfilters, atte
 
     # feature layers
     __model.add(Conv2D(input_shape=(3, iX, iY), data_format="channels_first", kernel_size=kernelfilters[0][0],
-                       filters=kernelfilters[0][1]))
+                       filters=kernelfilters[0][1], activation=ACTIVATION))
 
     for kernelfilter in kernelfilters:
-        furts = Conv2D(kernel_size=kernelfilter[0], filters=kernelfilter[1])
+        furts = Conv2D(kernel_size=kernelfilter[0], filters=kernelfilter[1], activation=ACTIVATION)
         __model.add(furts)
 
     # transition layer
-    __model.add(Conv2D(kernel_size=1, filters=m*m, strides=(t_stride, t_stride)))
+    __model.add(Conv2D(kernel_size=1, filters=m*m, strides=(t_stride, t_stride), activation=ACTIVATION))
 
     i = 0
     # attentional layers
