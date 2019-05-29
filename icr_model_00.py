@@ -1,8 +1,8 @@
 from keras.models import Sequential
 from keras.layers import Conv2D
 
-#
-def generate_model(imagecount, iX, iY, m, strides_per_frame, kernels, attentional_depth):
+
+def generate_model(imagecount, iX, iY, m, strides_per_frame, kernelfilters, attentional_depth):
     """This function creates a model that, *I hope*, takes as input an image of cancer cells
     and outputs an array of m*m vectors corresponding to image patches, each of which contains
     at most one cancer cell annotation. It is trained on real cancer cell images with
@@ -26,24 +26,28 @@ def generate_model(imagecount, iX, iY, m, strides_per_frame, kernels, attentiona
         a Keras model as described above (compiled but not trained)
         """
 
-    t_stride = m / strides_per_frame;
+    t_stride = m / strides_per_frame
 
-    model = Sequential()
+    __model = Sequential()
 
     # feature layers
-    model.add(Conv2D(input_shape=(imagecount, iX, iY, 3), data_format="channels_last"), kernel_size=kernels[0], filters = kernels[0])
-    for kernel in kernels:
-        model.add(Conv2D, kernel_size=kernel, filters=kernel)
+    __model.add(Conv2D(input_shape=(3, iX, iY), data_format="channels_first", kernel_size=kernelfilters[0][0],
+                       filters=kernelfilters[0][1]))
+
+    for kernelfilter in kernelfilters:
+        furts = Conv2D(kernel_size=kernelfilter[0], filters=kernelfilter[1])
+        __model.add(furts)
 
     # transition layer
-    model.add(Conv2D, kernel_size=1, filters=m*m, strides=t_stride)
+    __model.add(Conv2D(kernel_size=1, filters=m*m, strides=(t_stride, t_stride)))
 
-    i = 0;
+    i = 0
     # attentional layers
-    while (i < attentional_depth):
-        model.add(Conv2D, kernel_size=1, filters=m*m)
+    while i < attentional_depth:
+        __model.add(Conv2D(kernel_size=1, filters=m*m))
         i += 1
 
-    model.compile(loss='categorical_crossentropy', optimizer='sgd', metrics=['accuracy'])
+    __model.compile(loss='categorical_crossentropy', optimizer='sgd', metrics=['accuracy'])
 
-    return model
+    return __model
+
